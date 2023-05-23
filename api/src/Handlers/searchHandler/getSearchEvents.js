@@ -6,7 +6,7 @@ const getEventsController = require("../../Controllers/eventController/getEvents
 
 
 const getSearchEvents = async (req, res) => {
-  const {page} = req.query;
+  const page = req.query.page || 1;
   const date = req.date;
   // const subcategoria = req.subcategoria;
   const price = req.price;

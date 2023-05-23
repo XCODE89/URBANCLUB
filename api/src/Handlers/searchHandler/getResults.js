@@ -8,7 +8,7 @@ const { getAllArtist } = require("../../Controllers/artistControllers/getAllArti
 
 
 const getResults = async (req, res) => {
-  // const {page} = req.query
+  // const page = req.query.page || 1
   const categoria = req.categoria;
   // const subcategoria = req.subcategoria;
   const ubicacion = req.ubicacion;

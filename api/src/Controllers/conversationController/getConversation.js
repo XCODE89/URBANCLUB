@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { Conversation } = require("../../db");
+const { Conversation, Message } = require("../../db");
 
 const getConversation = async(userId) => {
   try {
@@ -13,8 +13,8 @@ const getConversation = async(userId) => {
     
     return conversationFound.reverse();
   } catch (err) {
-    return err
+    return err;
   }
-}
+};
 
 module.exports = getConversation;

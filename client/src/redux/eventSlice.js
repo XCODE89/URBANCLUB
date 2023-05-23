@@ -99,10 +99,10 @@ export const getAllLocations = () => {
 };
 
 
-export const FilterEvents = (date, price, ubicacion) => {
+export const FilterEvents = (date, price, ubicacion, page) => {
   return async (dispatch) => {
     try {
-      const apiData = await axios.get(`/search/events?date=${date}&price=${price}&ubicacion=${ubicacion}`);
+      const apiData = await axios.get(`/search/events?date=${date}&price=${price}&ubicacion=${ubicacion}&page=${page}`);
       const events = apiData.data;
       //console.log("APIIIIIDATA", apiData.data);
       return dispatch(getFilterEventsSuccess(events));

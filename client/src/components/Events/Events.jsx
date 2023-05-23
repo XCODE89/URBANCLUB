@@ -89,6 +89,9 @@ const Events = ({ showFilters }) => {
     if (ubicacion === filter) setUbicacion("");
   };
 
+  //! aqui termina la parte del scroll infinito
+
+
   return (
     <div className={style.container}>
       {showFilters ? (

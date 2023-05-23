@@ -26,13 +26,14 @@ const Artists = () => {
   console.log("category esta aqui", category)
   console.log("artistas esta aqui", artistas)
 
+
   const [orden, setOrden] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState([]);
-
+  
   // Paginado
   const currentPage = useSelector((state) => state.artist.pag);
   const [artistsPerPage, setArtistsPerPage] = useState(9); // Modificá la cantidad de Items vistos.
@@ -43,16 +44,18 @@ const Artists = () => {
     indexOfLastArtists
   );
   const dispatch = useDispatch();
-
+  
   useEffect(() => {
     function asynGetArtists() {
       // You can await here
       setIsLoading(true);
-
+      
+      console.log("aristas", artistas)
+      console.log("usuario", usuario)
       dispatch(getAllArts());
       dispatch(getAllCategories());
       dispatch(getAllLocations());
-
+      
       setIsLoading(false);
       // ...
     }
@@ -76,6 +79,7 @@ const Artists = () => {
     // dispatch(FilterArtists(selectedCategory));
     handlesFilter();
   }, [selectedCategory, selectedLocation, orden]);
+
 
   const handlesFilter = async () => {
     let artist = [...usuario];
