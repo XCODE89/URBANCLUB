@@ -9,6 +9,7 @@ const initialState = {
   Event: [],
   buyEvent: [],
   locations: [],
+  pag: 1,
 };
 
 export const eventSlice = createSlice({
@@ -65,16 +66,31 @@ export const eventSlice = createSlice({
 
       }
     },
-  },
+
+    pagNumSuccess(state, action) {
+      return {
+        ...state,
+        pag: action.payload,
+
+      }
+    },
+  }
 
 });
+
+
+export const pagNum = (number) => {
+  return async (dispatch) => {
+    dispatch(pagNumSuccess(number));
+  };
+};
 
 export const getAllLocations = () => {
   return async (dispatch) => {
     try {
       const result = await axios.get(`/search/events/locations`);
       const location = result.data;
-      console.log("LOCATION API", location);
+      //console.log("LOCATION API", location);
       return dispatch(getAllLocationsSuccess(location));
     } catch (error) {
       console.log(error);
@@ -88,7 +104,7 @@ export const FilterEvents = (date, price, ubicacion) => {
     try {
       const apiData = await axios.get(`/search/events?date=${date}&price=${price}&ubicacion=${ubicacion}`);
       const events = apiData.data;
-      console.log("APIIIIIDATA", apiData.data);
+      //console.log("APIIIIIDATA", apiData.data);
       return dispatch(getFilterEventsSuccess(events));
 
     } catch (error) {
@@ -198,8 +214,15 @@ export const buyTicket = (compra) => {
 }
 
 
-export const { getAllLocationsSuccess, getFilterEventsSuccess, postEventSuccess, getAllEventsSuccess,
-  gellDetailEvent, updateEventSuccess,
-  deleteEventSucces, buyEvent } = eventSlice.actions;
+export const { pagNumSuccess,
+  getAllLocationsSuccess,
+  getFilterEventsSuccess,
+  postEventSuccess,
+  getAllEventsSuccess,
+  gellDetailEvent,
+  updateEventSuccess,
+  deleteEventSucces,
+  buyEvent,
+} = eventSlice.actions;
 
 export default eventSlice.reducer;

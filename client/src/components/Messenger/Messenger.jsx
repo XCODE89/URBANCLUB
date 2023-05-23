@@ -10,26 +10,34 @@ import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
 import SentimentVerySatisfiedIcon from "@mui/icons-material/SentimentVerySatisfied";
 import DetailBar from "../DetailBar/DetailBar";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { URLS } from "../../env";
 
 function Messenger() {
   const [conversations, setConversations] = useState([]);
+  const [arrivalConversations, setArrivalConversations] = useState(null);
   const [currentChat, setCurrentChat] = useState(null);
   const [messages, setMessages] = useState([]);
   const [showPicker, setShowPicker] = useState(false);
   const [newMessage, setNewMessage] = useState("");
   const [arrivalMessage, setArraivalMessage] = useState(null);
   const [onlineUser, setOnlineUser] = useState([]);
-  //cambiar cuando hayan followers
-  //const[followers, setFollowers] = useState([]);
+  const [showOnlines, setShowOnlines] = useState(false);
+  const [showOfflines, setShowOfflines] = useState(false);
+  const [friends, setFriends] = useState([]);
   const artistas = useSelector((state) => state.artist.allUsuarios);
   const socket = useRef();
   const user = useSelector((state) => state.auth.user);
   const scrollRef = useRef();
-  const followers = artistas.filter((f) => f.id !== user.id);
+  const offlineFriends = friends.filter((friend) => {
+    return !onlineUser.some((user) => {
+      return user.id === friend.id;
+    });
+  });
 
-  useEffect(() => { 
+  useEffect(() => {
     // socket.current = io("ws://pruebaback-production-0050.up.railway.app");
-    socket.current = io("ws://localhost:3001");
+    socket.current = io(URLS);
     socket.current.on("getMessage", (data) => {
       setArraivalMessage({
         sender: data.senderId,
@@ -37,31 +45,49 @@ function Messenger() {
         createdAt: Date.now(),
       });
     });
+    socket.current.on("getConversation", (data) => {
+      setArrivalConversations({
+        id: data.id,
+        members: data.members,
+      });
+    });
   }, []);
 
   useEffect(() => {
     arrivalMessage &&
       currentChat?.members.includes(arrivalMessage.sender) &&
-      setMessages((prev) => [...prev, arrivalMessage]);
+      setMessages((prev) =>
+        Array.isArray(prev) ? [...prev, arrivalMessage] : [arrivalMessage]
+      );
   }, [arrivalMessage, currentChat]);
 
+  useEffect(() => {
+    arrivalConversations &&
+      !conversations?.find((conv) => conv.id === arrivalConversations.id) &&
+      setConversations((prev) => [...prev, arrivalConversations]);
+  }, [arrivalConversations, conversations]);
+
   //cambiar cuando hayan followers
-  /*  useEffect(() => {
-    const getFollowers = async() =>{
-      const res = await axios.get("/artist");
-      setFollowers(res.data.filter((f) => f.id !== user.id))
-    }
-    getFollowers()
-  },[]) */
+  useEffect(() => {
+    const getFriends = async () => {
+      const res = await axios.get(`artist/followings/${user.id}`);
+      setFriends(res.data);
+    };
+    getFriends();
+  }, [user.id]);
 
   useEffect(() => {
     socket.current.emit("addUser", user.id);
     socket.current.on("getUsers", (users) => {
       setOnlineUser(
-        followers.filter((f) => users.some((u) => u.userId === f.id))
+        friends.filter((f) => users.some((u) => u.userId === f.id))
       );
       /* setOnlineUser(users) */
     });
+    return () => {
+      //le paso un return cuando se desmonta
+      socket.current.emit("disconnectSocket");
+    };
   }, [user]);
 
   useEffect(() => {
@@ -77,6 +103,7 @@ function Messenger() {
   }, [user.id]);
 
   useEffect(() => {
+    /*  const interval = setInterval(() => { */
     const getmessages = async () => {
       try {
         const res = await axios.get(`/message/${currentChat?.id}`);
@@ -86,6 +113,11 @@ function Messenger() {
       }
     };
     getmessages();
+    /* }, 1500);
+
+  return () => {
+    clearInterval(interval);
+  }; */
   }, [currentChat]);
 
   const handleEmojiSelect = (emoji) => {
@@ -94,6 +126,24 @@ function Messenger() {
 
   const handleOnBlur = () => {
     setShowPicker(false);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSubmit(e);
+    }
+  };
+
+  const handleShowOnlines = () => {
+    setShowOnlines(!showOnlines);
+  };
+
+  const handleShowOfflines = () => {
+    setShowOfflines(!showOfflines);
+  };
+
+  const handleDeleteConversation = (convId) => {
+    setConversations(conversations.filter((c) => c.id !== convId));
   };
 
   const handleSubmit = async (e) => {
@@ -129,15 +179,21 @@ function Messenger() {
     scrollRef.current?.scrollIntoView({ behavior: "auto" });
   }, [messages]);
 
+
   return (
     <div className="messenger">
       <div className="chatMenu">
         <div className="chatMenuWrapper">
+          Conversaciones Activas
           {/* <input placeholder="Buscar amigos..." className="chatMenuInput"/> */}
           {Array.isArray(conversations) &&
             conversations.map((c) => (
               <div onClick={() => setCurrentChat(c)}>
-                <Conversation conversation={c} currentUser={user} />
+                <Conversation
+                  conversation={c}
+                  currentUser={user}
+                  handleDeleteConversation={handleDeleteConversation}
+                />
               </div>
             ))}
         </div>
@@ -146,7 +202,7 @@ function Messenger() {
         <div className="chatBoxWrapper">
           {currentChat ? (
             <>
-              <DetailBar conversation={currentChat} currentUser={user}/>
+              <DetailBar conversation={currentChat} currentUser={user} />
               <div className="chatBoxTop">
                 {Array.isArray(messages) &&
                   messages.map((m) => (
@@ -169,8 +225,9 @@ function Messenger() {
                 </button>
                 <textarea
                   className="chatMessageInput"
-                  placeholder="write something..."
+                  placeholder="Envia un mensaje..."
                   onChange={(e) => setNewMessage(e.target.value)}
+                  onKeyDown={handleKeyDown}
                   value={newMessage}
                 ></textarea>
                 <div className="emojieBoxForAbsolute">
@@ -199,12 +256,37 @@ function Messenger() {
       </div>
       <div className="chatOnline">
         <div className="chatOnlineWrapper">
-          <Chats
-            onlineUser={onlineUser}
-            currentId={user.id}
-            setCurrentChat={setCurrentChat}
-            online={false}
-          />
+          <div className="listOnline">
+            Conectados {` ( ${onlineUser.length} )`}
+            <button className="listlinesbtn" onClick={handleShowOnlines}>
+              <ExpandMoreIcon />
+            </button>
+          </div>
+          {showOnlines && (
+            <Chats
+              onlineUser={onlineUser}
+              currentId={user.id}
+              setCurrentChat={setCurrentChat}
+              setConversations={setConversations}
+              online={true}
+            />
+          )}
+          <div className="listOffline">
+            Desconectados {` ( ${offlineFriends.length} )`}
+            <button className="listlinesbtn" onClick={handleShowOfflines}>
+              <ExpandMoreIcon />
+            </button>
+          </div>
+
+          {showOfflines && (
+            <Chats
+              onlineUser={offlineFriends}
+              currentId={user.id}
+              setCurrentChat={setCurrentChat}
+              setConversations={setConversations}
+              online={false}
+            />
+          )}
         </div>
       </div>
     </div>

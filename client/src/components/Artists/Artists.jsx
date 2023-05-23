@@ -10,7 +10,7 @@ import {
   getAllCategories,
   getAllLocations,
   pagNum,
-  
+  getArtistName,
 } from "../../redux/artistSlice";
 import loading from "../../img/loading.gif";
 import Errors404search from "../Error404/Error404search";
@@ -26,22 +26,22 @@ const Artists = () => {
   console.log("category esta aqui", category)
   console.log("artistas esta aqui", artistas)
 
-
-
-  
   const [orden, setOrden] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedLocation, setSelectedLocation] = useState('');
-  //  const [search, setSearch]= useState('')
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState("");
+  const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState([]);
 
   // Paginado
-  const currentPage = useSelector(state => state.artist.pag)
-  const [artistsPerPage, setArtistsPerPage] = useState(1) // eslint-disable-line
+  const currentPage = useSelector((state) => state.artist.pag);
+  const [artistsPerPage, setArtistsPerPage] = useState(9); // Modificá la cantidad de Items vistos.
   const indexOfLastArtists = currentPage * artistsPerPage; //1
   const indexOfFirstArtists = indexOfLastArtists - artistsPerPage;
-  const currentArtists = artistas.slice(indexOfFirstArtists, indexOfLastArtists);
+  const currentArtists = artistas.slice(
+    indexOfFirstArtists,
+    indexOfLastArtists
+  );
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -62,17 +62,24 @@ const Artists = () => {
     return dispatch(cleanArtists);
   }, [dispatch]);
 
+  useEffect(() => {
+    if (search.trim() !== "") {
+      dispatch(getArtistName(search));
+      //dispatch (pagNum(1));
+    } else {
+      dispatch(getAllArts());
+    }
+  }, [search]); // eslint-disable-line
 
   useEffect(() => {
-    dispatch (pagNum(1));
+    dispatch(pagNum(1));
     // dispatch(FilterArtists(selectedCategory));
     handlesFilter();
   }, [selectedCategory, selectedLocation, orden]);
 
- 
   const handlesFilter = async () => {
     let artist = [...usuario];
-    
+
     const events = orden;
 
     if (selectedCategory !== "" || selectedLocation !== "" || orden !== "") {
@@ -110,26 +117,42 @@ const Artists = () => {
         <br />
         <div className={style.containerFilters}>
           <form className={style.filtersLogic}>
-
-              <select
-              className={style.selectFilters} 
-              value={selectedCategory} 
-              onChange={(e) => setSelectedCategory(e.target.value)}>
+            <input
+              style={{ width: "180px" }}
+              className={style.selectFilters}
+              type="text"
+              value={search}
+              placeholder="¿Qué artista quieres ver hoy?"
+              onChange={(event) => setSearch(event.target.value)}
+            />
+            <select
+              className={style.selectFilters}
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+            >
               <option value="">Todas las ocupaciones</option>
               {categories?.map((category) => (
-              <option key={category} value={category}>{category}</option>
+                <option key={category} value={category}>
+                  {category}
+                </option>
               ))}
-              </select>
-
+            </select>
 
             <select
               value={selectedLocation}
               onChange={(event) => setSelectedLocation(event.target.value)}
             >
               <option value="">Todos los países</option>
-              {locations?.map((Country) => (
-              <option key={Country} value={Country}>{Country}</option>
-              ))}
+              {locations?.map((Country) => {
+                if (Country.trim() !== "") {
+                  return (
+                    <option key={Country} value={Country}>
+                      {Country}
+                    </option>
+                  );
+                }
+                return null;
+              })}
             </select>
 
             <select
@@ -143,27 +166,20 @@ const Artists = () => {
 
             <button
               type="button"
-              onClick={() => (setSelectedCategory(""), setSelectedLocation(""), setOrden(""))}
+              onClick={() => (
+                setSelectedCategory(""),
+                setSelectedLocation(""),
+                setOrden(""),
+                setSearch("")
+              )}
             >
               Limpiar
             </button>
           </form>
-          
-          {/* <div className={style.selectedFilters}>
-            {selectedFilters.map((filter) => (
-              <div key={filter} className={style.selectedFilter}>
-                <span>{filter}</span>
-                <button onClick={() => handleRemoveFilter(filter)}>X</button>
-              </div>
-            ))}
-          </div> */}
         </div>
         <br />
-        <Paginado
-          artistsPerPage={artistsPerPage}
-          artistas={artistas.length}/>
+        <Paginado artistsPerPage={artistsPerPage} artistas={artistas.length} />
         <div className={style.containerArtists}>
-        
           {isLoading && (
             <div className="loading-gif">
               <img className="loading" src={loading} alt="" width="50px"></img>
@@ -171,7 +187,6 @@ const Artists = () => {
           )}
           {!isLoading && currentArtists.length > 0
             ? currentArtists.map((item) => {
-                console.log("HOLAAAAAAA",currentArtists);
                 let ocupacion;
                 item.ocupation !== undefined
                   ? (ocupacion = item.ocupation)
@@ -182,6 +197,7 @@ const Artists = () => {
                       id={item.id}
                       name={item.name}
                       profilePhoto={item.profilePhoto}
+                      coverPhoto={item.coverPhoto}
                       ocupation={ocupacion}
                       aboutMe={item.aboutMe}
                       Country={item.Country}
@@ -192,7 +208,9 @@ const Artists = () => {
                 );
               })
             : !isLoading &&
-              currentArtists.length === 0 && <Errors404search></Errors404search>}
+              currentArtists.length === 0 && (
+                <Errors404search></Errors404search>
+              )}
         </div>
         <br /> <br />
       </div>

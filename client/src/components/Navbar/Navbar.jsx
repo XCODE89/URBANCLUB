@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import style from "./Navbar.module.css";
@@ -36,10 +35,14 @@ function Navbar() {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo(0, 0);
+  };
   return (
     <>
       <nav className={`${style.navbar} ${isScrolled ? style.scrolled : ""}`}>
-        <NavLink to="/">
+        <NavLink to="/" onClick={scrollToTop}>
           <img
             className={style.navTitleImg}
             src="https://res.cloudinary.com/dipn8zmq3/image/upload/v1683969976/UrbanClub/our_logo-removebg-preview_auto_x2-removebg-preview_1_tsbanf.png"
@@ -50,21 +53,27 @@ function Navbar() {
             src="https://res.cloudinary.com/dipn8zmq3/image/upload/v1683969976/UrbanClub/our_logo-removebg-preview_auto_x2-removebg-preview_1_tsbanf.png"
             alt=""
           />
+          <img
+            className={style.navTitleImgText}
+            src="https://res.cloudinary.com/dipn8zmq3/image/upload/v1684272293/filename_5_jnxox9.png"
+            alt=""
+          />
         </NavLink>
-        <div className={style.searchbarWrapper}>
-          <SearchBar />
-        </div>
+        {/* <div className={style.searchbarWrapper} onClick={scrollToTop}></div> */}
+        {/* <SearchBar /> Estó en deploy está roto*/}
+
         {/*<SearchIcon style={{color:"white"}}/>*/}
         <ul className={style.navLinks}>
-          <li>
+          {/* <li>
             <NavLink to="/admin" className={`${style.navLink} ${style.active}`}>
               Admin
             </NavLink>
-          </li>
+          </li> */}
           <li>
             <NavLink
               to="/artists"
               className={`${style.navLink} ${style.active}`}
+              onClick={scrollToTop}
             >
               Artistas
             </NavLink>
@@ -73,6 +82,7 @@ function Navbar() {
             <NavLink
               to="/aboutus"
               className={`${style.navLink} ${style.active}`}
+              onClick={scrollToTop}
             >
               Nosotros
             </NavLink>
@@ -81,6 +91,7 @@ function Navbar() {
             <NavLink
               to="/events"
               className={`${style.navLink} ${style.active}`}
+              onClick={scrollToTop}
             >
               Eventos
             </NavLink>
@@ -92,7 +103,11 @@ function Navbar() {
         </li> */}
           {islogin.isAuthenticated && (
             <li>
-              <NavLink to="/messenger" className="nav-link active">
+              <NavLink
+                to="/messenger"
+                className="nav-link active"
+                onClick={scrollToTop}
+              >
                 Chat
               </NavLink>
             </li>
@@ -112,6 +127,7 @@ function Navbar() {
               <NavLink
                 to="/artists"
                 className={`${style.navLink} ${style.active}`}
+                onClick={scrollToTop}
               >
                 Artistas
               </NavLink>
@@ -120,6 +136,7 @@ function Navbar() {
               <NavLink
                 to="/aboutus"
                 className={`${style.navLink} ${style.active}`}
+                onClick={scrollToTop}
               >
                 Acerca de
               </NavLink>
@@ -128,6 +145,7 @@ function Navbar() {
               <NavLink
                 to="/events"
                 className={`${style.navLink} ${style.active}`}
+                onClick={scrollToTop}
               >
                 Eventos
               </NavLink>
@@ -138,11 +156,11 @@ function Navbar() {
             </NavLink>
           </li> */}{" "}
             {!islogin.isAuthenticated ? (
-              <NavLink to="/login">
+              <NavLink to="/login" onClick={scrollToTop}>
                 <button className={style.navLoginBtnZoom}>Ingresar</button>
               </NavLink>
             ) : (
-              <NavLink to={`/profile/${islogin.user.id}`}>
+              <NavLink to={`/profile/${islogin.user.id}`} onClick={scrollToTop}>
                 <img
                   className={style.sesionfotozoom}
                   src={usuario.profilePhoto}
@@ -150,15 +168,26 @@ function Navbar() {
                 />
               </NavLink>
             )}
+            {islogin.isAuthenticated && (
+              <li>
+                <NavLink
+                  to="/messenger"
+                  className="nav-link active"
+                  onClick={scrollToTop}
+                >
+                  Chat
+                </NavLink>
+              </li>
+            )}
           </ul>
         </div>
         <div className="profilePicture">
           {!islogin.isAuthenticated ? (
-            <NavLink to="/login">
+            <NavLink to="/login" onClick={scrollToTop}>
               <button className={style.navLoginBtn}>Ingresar</button>
             </NavLink>
           ) : (
-            <NavLink to={`/profile/${islogin.user.id}`}>
+            <NavLink to={`/profile/${islogin.user.id}`} onClick={scrollToTop}>
               <img
                 className={style.sesionfoto}
                 src={usuario.profilePhoto}

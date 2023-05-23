@@ -1,9 +1,16 @@
-chatOnlineFriend {
+.chatOnlineFriend {
   display: flex;
   align-items: center;
   font-weight: 500;
   cursor: pointer;
   margin-top: 10px;
+  padding: 5px;
+  transition: 0.4s ease;
+}
+
+.chatOnlineFriend:hover {
+  background: linear-gradient(180deg, #0d5a7337 0%, #09548e39 100%);
+  border-radius: 15px;
 }
 
 .chatOnlineImgContainer {
@@ -24,6 +31,15 @@ chatOnlineFriend {
   height: 10px;
   border-radius: 50%;
   background-color: limegreen;
+  position: absolute;
+  top: 2px;
+  right: 2px;
+}
+.chatOfflineBadge{
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: rgb(123, 123, 123);
   position: absolute;
   top: 2px;
   right: 2px;

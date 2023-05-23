@@ -66,9 +66,9 @@ export default function Carousel(props) {
           )}
           <div className={Style.subtitle}>
             <img
-              src="https://res.cloudinary.com/dipn8zmq3/image/upload/v1684007750/text-1684007710711_hcos93.png"
+              className={Style.imgSubtitle}
+              src="https://res.cloudinary.com/dipn8zmq3/image/upload/v1684272293/filename_5_jnxox9.png"
               alt=""
-              srcset=""
             />
             <br />
             <br />

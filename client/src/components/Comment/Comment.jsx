@@ -5,7 +5,6 @@ import StarRating from "../StarRating/StarRating";
 
 const Comment = (props) => {
   const { c } = props;
-  console.log(c);
   const [user, setUser] = useState([]);
 
   useEffect(() => {
@@ -22,20 +21,20 @@ const Comment = (props) => {
 
   return (
     <div className={styles.commentContainer}>
-      <div>
+      <section>
         <img
           src={user.profilePhoto}
           alt="Profile"
           className={styles.commentProfilePhoto}
         />
-      </div>
-      <div className={styles.commentContent}>
+      </section> 
+      <section className={styles.commentContent}>
         <div className={styles.commentRating}>
-          <StarRating rating={c.rating} />
+          <StarRating rating={c.rating} className={styles.starRating} />
         </div>
         <div className={styles.commentAuthor}>{user.name}</div>
         <div className={styles.commentText}>{c.comment}</div>
-      </div>
+      </section>
     </div>
   );
 };

@@ -27,6 +27,7 @@ export const authSlice = createSlice({
   initialState,
   reducers: {
     loginSuccess(state, action) {
+      console.log(action)
       const artist = jwt_decode(action.payload.token); // Acá te lo decodifica ###
       localStorage.setItem("token", action.payload.token);
       //localStorage.setItem("user", JSON.stringify(artist));
@@ -93,7 +94,7 @@ export const login = (payload, navigate) => {
       swal({
         title: "DATOS INVÁLIDOS",
         text: `Datos Inválidos, Por favor Revisar`,
-        icon: "warning",
+        icon: "error",
         buttons: "Aceptar"
       })
     }

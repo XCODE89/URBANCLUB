@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import AboutUs from "./components/AboutUs/AboutUs";
 import AboutEstiven from "./components/AboutUs/AboutEstiven";
 import AboutOscar from "./components/AboutUs/AboutOscar";
@@ -29,8 +29,6 @@ import AboutEze from "./components/AboutUs/AboutEze";
 import Errors404 from "./components/Error404/Errors404";
 import Messenger from "./components/Messenger/Messenger";
 import LoginSuccess from "./components/GoogleButton/loginSuccess";
-/* import { io } from "socket.io-client";
-const socket = io("http://localhost:3001"); */
 // reemplazar 3001 por https://pruebaback-production-0050.up.railway.app
 import UpdateEvents from "./components/updateEvent/UpdateEvents";
 import ForgotPassword from "./components/ForgotPassword/ForgotPassword";
@@ -38,10 +36,19 @@ import NewPassword from "./components/NewPassword/NewPassword";
 import DetailsEvents from "./components/ComponentEvents/DetailsEvents/DetailsEvents";
 import TermsAndConditions from "./components/TermsAndConditions/TermsAndConditions";
 import Admin from "./components/Admin/Admin";
+import AboutMiguel from "./components/AboutUs/AboutMiguel";
+import AboutAlan from "./components/AboutUs/AboutAlan";
+import AboutPablo from "./components/AboutUs/AboutPablo";
+import AboutAlex from "./components/AboutUs/AboutAlex";
+import AboutEudes from "./components/AboutUs/AboutEudes";
+/* import { io } from "socket.io-client";
+const socket = io("http://localhost:8900"); */
+
 function App() {
   const dispatch = useDispatch();
   //const history = useHistory();
   const user = useSelector((state) => state.auth);
+  const location = useLocation();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -61,14 +68,19 @@ function App() {
       }
     }
   }, [dispatch]);
-
+  const isMessengerPage = location.pathname === "/messenger";
   /* useEffect(() => {
     if(user.isAuthenticated){
       socket.emit("addUser", user.user.id);
     }
-  },[user])
- */
+  },[user]) */
+
   //No modifiquen cosas que estan bien solo buscando un error de ustedes plsssssssssssssssssssssssssss, Gracias :))
+  const isMessengerOrProfileRoute =
+    window.location.pathname.includes("/messenger") ||
+    window.location.pathname.includes("/profile/") ||
+    window.location.pathname.includes("/admin");
+
   return (
     <div>
       <Navbar />
@@ -92,7 +104,7 @@ function App() {
         />
         <Route path="/artists" element={<Artists />} />
         <Route path="/aboutus" element={<AboutUs />} />
-        <Route path="/events" element={<Events />} />
+        <Route path="/events" element={<Events showFilters={true} />} />
         <Route
           path="/createevent/:id"
           element={
@@ -103,6 +115,11 @@ function App() {
         <Route path="/About/Estiven" element={<AboutEstiven />} />
         <Route path="/About/oscar" element={<AboutOscar />} />
         <Route path="/About/Eze" element={<AboutEze />} />
+        <Route path="/About/Miguel" element={<AboutMiguel />} />
+        <Route path="/About/Alan" element={<AboutAlan />} />
+        <Route path="/About/Pablo" element={<AboutPablo />} />
+        <Route path="/About/Alex" element={<AboutAlex />} />
+        <Route path="/About/Eudes" element={<AboutEudes />} />
 
         <Route
           path="/messenger"
@@ -126,14 +143,14 @@ function App() {
         <Route path="/detailEvent/:id" element={<DetailsEvents />} />
         <Route path="/Maps" element={<Maps />} />
         <Route path="/termsAndConditions" element={<TermsAndConditions />} />
-        <Route
+        {/* <Route
           path="/admin"
           element={user.isAuthenticated ? <Admin /> : <Navigate to="/login" />}
-        />
+        /> */}
 
         <Route path="*" element={<Errors404 />} />
       </Routes>
-      {window.location.pathname !== "/messenger" && <Footer />}
+      {!isMessengerPage && <Footer />}
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import Comment from "../Comment/Comment";
+import style from "./Comments.module.css";
 
 const Comments = (event) => {
   const currentUser = useSelector((state) => state.auth);
@@ -29,14 +30,16 @@ const Comments = (event) => {
     setRating(value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    axios.post(`/eventComments`, {
+    const newComment = {
       writer: currentUser.user.id,
       comment: comment,
       rating: rating,
       id_event: event.event.id,
-    });
+    };
+    await axios.post(`/eventComments`, newComment);
+    setComentarios((prevComments) => [...prevComments, newComment]);
     setComment("");
     setRating(0);
   };
@@ -45,42 +48,59 @@ const Comments = (event) => {
     <>
       <div>
         {comentarios ? (
-          comentarios?.map((c) => {
-            return (
-              <Comment
-                key={event.event.id}
-                c={c}
-                // userProfilePhoto={currentUser.user.profilePhoto}
-              />
-            );
-          })
+          comentarios.map((c) => (
+            <Comment
+              key={c.id}
+              c={c}
+              // userProfilePhoto={currentUser.user.profilePhoto}
+            />
+          ))
         ) : (
           <div></div>
         )}
       </div>
-      <form onSubmit={handleSubmit}>
-        <div className="rating">
-          {[1, 2, 3, 4, 5].map((value) => (
-            <label key={value}>
-              <input
-                type="radio"
-                name="rating"
-                value={value}
-                checked={rating === value}
-                onChange={() => handleRatingChange(value)}
-              />
-              <span className="star">&#9733;</span>
-            </label>
-          ))}
-        </div>
-        <input
-          type="text"
-          name="comment"
-          value={comment}
-          onChange={handleOnChange}
-        />
-        <button type="submit">Comentar</button>
-      </form>
+      {currentUser.isAuthenticated ? (
+        <form onSubmit={handleSubmit}>
+          <div className="rating">
+            {[1, 2, 3, 4, 5].map((value) => {
+              const isSelected = rating === value;
+              return (
+                <label
+                  className={`${style.divStar} ${
+                    isSelected ? style.selected : ""
+                  }`}
+                  key={value}
+                >
+                  {value} {/* Número de la estrella */}
+                  <input
+                    type="radio"
+                    name="rating"
+                    value={value}
+                    checked={isSelected}
+                    onChange={() => handleRatingChange(value)}
+                  />
+                  <span
+                    className={`${style.star} ${
+                      isSelected ? style.yellow : style.white
+                    }`}
+                  >
+                    &#9733;
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+          <input
+            type="text"
+            name="comment"
+            value={comment}
+            onChange={handleOnChange}
+          />
+          <button type="submit">Comentar</button>
+        </form>
+      ) : (
+        <div></div>
+      )}
     </>
   );
 };

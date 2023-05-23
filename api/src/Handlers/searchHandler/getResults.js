@@ -23,7 +23,7 @@ const getResults = async (req, res) => {
 
   if (categoria) {
 
-    artistasFiltrados = artistasFiltrados.filter(artista => artista.ocupation.includes(categoria));
+    artistasFiltrados = artistasFiltrados.filter(artista => artista.ocupation && artista.ocupation.includes(categoria));
   }
 
   // if (subcategoria) {
